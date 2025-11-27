@@ -1,38 +1,90 @@
 import { ref } from 'vue';
-import { useTodoStore } from '../stores/todo-store';
-import type { Category } from '../types/Category';
 import type { TodoItem } from '../types/TodoItem';
+import type { Category } from '../types/Category';
 
+const LS_KEY = 'TODO_LIST_DATA';
+
+// Make a single reactive instance
+const categories = ref<Category[]>(JSON.parse(localStorage.getItem(LS_KEY) || '[]'));
+
+const persist = () => {
+  localStorage.setItem(LS_KEY, JSON.stringify(categories.value));
+};
 
 export function useTodos() {
-const store = useTodoStore();
-const error = ref<string | null>(null);
-
-
-function createCategory(title: string) {
-const payload: Category = {
-id: String(Date.now()),
-title,
-todos: []
+  // Category actions
+  const addCategory = (category: Category) => {
+  const exists = categories.value.some(
+    c => c.title.trim().toLowerCase() === category.title.trim().toLowerCase()
+  );
+  if (exists) {
+    throw new Error('Duplicate category not allowed');
+  }
+  categories.value.push(category);
+  persist();
 };
-store.addCategory(payload);
-}
 
 
-function createTodo(categoryId: string, text: string) {
-const todo: TodoItem = {
-id: String(Date.now()),
-text,
-completed: false
-};
-try {
-store.addTodo(categoryId, todo);
-error.value = null;
-} catch (e:any) {
-error.value = e.message || 'Failed';
-}
-}
+  const updateCategoryTitle = (categoryId: string, title: string) => {
+    const category = categories.value.find(c => c.id === categoryId);
+    if (category) category.title = title;
+    persist();
+  };
 
+  const deleteCategory = (categoryId: string) => {
+    categories.value = categories.value.filter(c => c.id !== categoryId);
+    persist();
+  };
 
-return { store, createCategory, createTodo, error };
+  // Todo actions
+  const addTodo = (categoryId: string, todo: TodoItem) => {
+    const category = categories.value.find(c => c.id === categoryId);
+    if (category) {
+      const exists = category.todos.some(
+        t => t.text.trim().toLowerCase() === todo.text.trim().toLowerCase()
+      );
+      if (!exists) {
+        category.todos.push(todo);
+        persist();
+      } else {
+        throw new Error('Duplicate todo not allowed');
+      }
+    }
+  };
+
+  const updateTodo = (categoryId: string, todoId: string, payload: Partial<TodoItem>) => {
+    const category = categories.value.find(c => c.id === categoryId);
+    if (category) {
+      const todo = category.todos.find(t => t.id === todoId);
+      if (todo) Object.assign(todo, payload);
+      persist();
+    }
+  };
+
+  const deleteTodo = (categoryId: string, todoId: string) => {
+    const category = categories.value.find(c => c.id === categoryId);
+    if (category) {
+      category.todos = category.todos.filter(t => t.id !== todoId);
+      persist();
+    }
+  };
+
+  const reorderTodos = (categoryId: string, newTodos: TodoItem[]) => {
+    const category = categories.value.find(c => c.id === categoryId);
+    if (category) {
+      category.todos = newTodos;
+      persist();
+    }
+  };
+
+  return {
+    categories,
+    addCategory,
+    updateCategoryTitle,
+    deleteCategory,
+    addTodo,
+    updateTodo,
+    deleteTodo,
+    reorderTodos
+  };
 }

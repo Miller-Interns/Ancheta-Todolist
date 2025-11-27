@@ -1,68 +1,112 @@
 <template>
-    <div class="app-root">
-        <h2 class="todoHeader">TODO List Exercise</h2>
-        <add-category-form class="addCategory" @create="onCreateCategory" />
+  <div class="app-root">
+    <h2 class="todoHeader">TODO List Exercise</h2>
 
-        <div class="categories-wrapper">
-            <div class="categories">
-                <category-card class="categoriesCard"
-                v-for="cat in store.categories"
-                :key="cat.id"
-                :category="cat"
-                @delete="onDeleteCategory"
-                @update-title="onUpdateTitle"
-                @add-todo="onAddTodo"
-                @update-todo="onUpdateTodo"
-                @delete-todo="onDeleteTodo"
-                @reorder="onReorder"
-                />
-            </div>
-        </div>
+    <!-- Add Category Form -->
+    <add-category-form class="addCategory" @create="onCreateCategory" />
+
+    <!-- Categories -->
+    <div class="categories-wrapper">
+      <div class="categories">
+        <category-card
+          v-for="cat in categories"
+          :key="cat.id"
+          :category="cat"
+          @delete="onDeleteCategory"
+          @update-title="onUpdateTitle"
+          @add-todo="onAddTodo"
+          @update-todo="onUpdateTodo"
+          @delete-todo="onDeleteTodo"
+          @reorder="onReorder"
+        />
+      </div>
     </div>
+  </div>
 </template>
 
-
 <script setup lang="ts">
-    import { useTodoStore } from '@/stores/todo-store';
-    import addCategoryForm from '@/components/add-category-form.vue';
-    import categoryCard from '@/components/category-card.vue';
+import { useTodos } from '@/composables/use-todos';
+import AddCategoryForm from '@/components/add-category-form.vue';
+import CategoryCard from '@/components/category-card.vue';
+import type { TodoItem } from '@/types/TodoItem';
+import type { Category } from '@/types/Category';
 
+// Use singleton composable to make state reactive across components
+const {
+  categories,
+  addCategory,
+  deleteCategory,
+  updateCategoryTitle,
+  addTodo,
+  updateTodo,
+  deleteTodo,
+  reorderTodos
+} = useTodos();
 
-    const store = useTodoStore();
+// -------------------
+// Handlers
+// -------------------
 
+function onCreateCategory(title: string) {
+  addCategory({
+    id: String(Date.now()), // simple unique id
+    title,
+    todos: []
+  });
+}
 
-    function onCreateCategory(title:string){
-    store.addCategory({ id: String(Date.now()), title, todos: [] });
-    }
-    function onDeleteCategory(id:string){ store.deleteCategory(id); }
-    function onUpdateTitle(id:string, title:string){ store.updateCategoryTitle(id, title); }
-    function onAddTodo(categoryId:string, todo:any){ store.addTodo(categoryId, todo); }
-    function onUpdateTodo(categoryId:string, todoId:string, payload:any){ store.updateTodo(categoryId, todoId, payload); }
-    function onDeleteTodo(categoryId:string, todoId:string){ store.deleteTodo(categoryId, todoId); }
-    function onReorder(categoryId:string, newTodos:any[]){ store.reorderTodos(categoryId, newTodos); }
+function onDeleteCategory(categoryId: string) {
+  deleteCategory(categoryId);
+}
+
+function onUpdateTitle(categoryId: string, title: string) {
+  updateCategoryTitle(categoryId, title);
+}
+
+function onAddTodo(categoryId: string, todo: TodoItem) {
+  addTodo(categoryId, todo);
+}
+
+function onUpdateTodo(categoryId: string, todoId: string, payload: Partial<TodoItem>) {
+  updateTodo(categoryId, todoId, payload);
+}
+
+function onDeleteTodo(categoryId: string, todoId: string) {
+  deleteTodo(categoryId, todoId);
+}
+
+function onReorder(categoryId: string, newTodos: TodoItem[]) {
+  reorderTodos(categoryId, newTodos);
+}
 </script>
 
-
 <style scoped>
-.app-root{ padding:1rem }
-.categories{ 
-    display:flex; 
-    flex-wrap:wrap; 
-    gap:1rem; 
-    justify-content:center; 
-    margin-top:5%; 
-    flex-flow: row wrap;
+.app-root {
+  padding: 1rem;
 }
-.todoHeader{
-    display: flex; 
-    justify-content: center; 
-    font-size: xx-large;
+
+.todoHeader {
+  display: flex;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 1rem;
 }
-.addCategory{
-    display:flex;
-    justify-content:center ;
+
+.addCategory {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
 }
-.categoriesCard{
-    width:20%;
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.categoriesCard {
+  width: 20%;
+  min-width: 200px; /* responsive */
 }
 </style>

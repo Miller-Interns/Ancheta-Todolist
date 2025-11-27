@@ -14,7 +14,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import type { TodoItem } from '@/types/TodoItem';
-import { useTodoStore } from '@/stores/todo-store';
+import { useTodos } from '@/composables/use-todos';
 
 export default defineComponent({
   name: 'AddTodoForm',
@@ -26,7 +26,7 @@ export default defineComponent({
   },
   setup(props) {
     const todoText = ref('');
-    const store = useTodoStore();
+    const { addTodo } = useTodos(); // Use singleton composable
 
     const submitTodo = () => {
       const text = todoText.value.trim();
@@ -38,7 +38,7 @@ export default defineComponent({
           text,
           completed: false
         };
-        store.addTodo(props.categoryId, newTodo);
+        addTodo(props.categoryId, newTodo); // reactive update
         todoText.value = '';
       } catch (err: any) {
         alert(err.message); // duplicate todo

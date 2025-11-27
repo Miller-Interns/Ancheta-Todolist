@@ -32,7 +32,7 @@
         {{ editing ? '💾 Save' : '✏️ Edit' }}
       </button>
 
-      <button class="delete-btn" @click="$emit('delete', localTodo.id)">
+      <button class="delete-btn" @click="deleteTodo">
         🗑 Delete
       </button>
     </div>
@@ -42,7 +42,7 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
 import type { TodoItem } from '@/types/TodoItem';
-import { useTodoStore } from '@/stores/todo-store';
+import { useTodos } from '@/composables/use-todos';
 
 export default defineComponent({
   name: 'TodoItem',
@@ -50,13 +50,14 @@ export default defineComponent({
     categoryId: { type: String, required: true },
     todo: { type: Object as () => TodoItem, required: true }
   },
-  emits: ['delete'],
-  setup(props, { emit }) {
-    const store = useTodoStore();
+  setup(props) {
+    const { updateTodo, deleteTodo } = useTodos(); // composable
+
     const localTodo = ref<TodoItem>({ ...props.todo });
     const editing = ref(false);
-    const tempText = ref(localTodo.value.text); // store temporary edit
+    const tempText = ref(localTodo.value.text);
 
+    // Keep local copy in sync with prop
     watch(
       () => props.todo,
       (newVal) => {
@@ -66,29 +67,36 @@ export default defineComponent({
       { deep: true }
     );
 
+    // Toggle completed state
     const toggleCompleted = () => {
-      store.updateTodo(props.categoryId, localTodo.value.id, {
+      updateTodo(props.categoryId, localTodo.value.id, {
         completed: !localTodo.value.completed
       });
     };
 
+    // Start editing
     const startEdit = () => {
       editing.value = true;
       tempText.value = localTodo.value.text;
     };
 
+    // Save edited text
     const saveEdit = () => {
       const text = tempText.value.trim();
       if (!text) {
-        emit('delete', localTodo.value.id);
+        deleteTodo(props.categoryId, localTodo.value.id);
         return;
       }
-      store.updateTodo(props.categoryId, localTodo.value.id, { text });
-      localTodo.value.text = text;
+      updateTodo(props.categoryId, localTodo.value.id, { text });
       editing.value = false;
     };
 
-    return { localTodo, editing, tempText, toggleCompleted, startEdit, saveEdit, emit };
+    // Delete todo
+    const deleteTodoHandler = () => {
+      deleteTodo(props.categoryId, localTodo.value.id);
+    };
+
+    return { localTodo, editing, tempText, toggleCompleted, startEdit, saveEdit, deleteTodo: deleteTodoHandler };
   }
 });
 </script>
@@ -112,20 +120,14 @@ export default defineComponent({
   background-color: #ffe4e9; /* pink */
 }
 
-.todo-item span {
-  cursor: pointer;
-  margin-bottom: 0.5rem;
-  word-break: break-word;
-}
-
 .todo-item span,
 .edit-input {
   cursor: pointer;
   margin-bottom: 0.5rem;
-  word-break: break-word;   /* breaks long words */
-  white-space: normal;      /* allows text to wrap to next line */
-  overflow-wrap: anywhere;  /* forces wrap even for long words/URLs */
-  width: 100%;              /* full width of the container */
+  word-break: break-word;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  width: 100%;
 }
 
 .todo-item span.completed {
@@ -133,11 +135,9 @@ export default defineComponent({
 }
 
 .edit-input {
-  margin-bottom: 0.5rem;
   padding: 0.25rem;
   border: 1px solid #ccc;
   border-radius: 0.25rem;
-  width: 100%;
 }
 
 .button-row {
@@ -146,7 +146,6 @@ export default defineComponent({
   flex-wrap: wrap;
 }
 
-/* Done button colors */
 .done-btn.done {
   background-color: #10b981; /* green */
   color: white;
@@ -156,7 +155,6 @@ export default defineComponent({
   color: white;
 }
 
-/* Edit / Save button */
 .edit-btn {
   background-color: #f59e0b;
   color: white;

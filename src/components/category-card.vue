@@ -3,14 +3,11 @@
     <!-- Category Header -->
     <div class="card-header">
       <input v-model="localTitle" @blur="saveTitle" class="title-input" />
-      <button @click="$emit('delete', category.id)" class="delete-btn">Delete</button>
+      <button @click="deleteCategoryHandler" class="delete-btn">Delete</button>
     </div>
 
     <!-- Add Todo Form -->
-    <add-todo-form
-      :category-id="category.id"
-      @create="onCreateTodo"
-    />
+    <add-todo-form :category-id="category.id" />
 
     <!-- Todo Items -->
     <div>
@@ -19,8 +16,6 @@
         :key="t.id"
         :category-id="category.id"
         :todo="t"
-        @update="onUpdateTodo"
-        @delete="onDeleteTodo"
       />
     </div>
   </div>
@@ -28,42 +23,34 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import type {TodoItem as TodoItemType } from '../types/TodoItem';
-import type { Category} from '../types/Category';
-import AddTodoForm from '../components/add-todo-form.vue';
-import TodoItem from '../components/todo-item.vue';
+import type { Category } from '../types/Category';
+import AddTodoForm from './add-todo-form.vue';
+import TodoItem from './todo-item.vue';
+import { useTodos } from '../composables/use-todos.ts';
 
 // Props
 const props = defineProps<{ category: Category }>();
-const emit = defineEmits([
-  'delete',
-  'update-title',
-  'add-todo',
-  'update-todo',
-  'delete-todo'
-]);
 
-// Local state
+// Composable
+const { updateCategoryTitle, deleteCategory } = useTodos();
+
+// Local title for editing
 const localTitle = ref(props.category.title);
+
+// Watch for external updates
 watch(() => props.category.title, (v) => (localTitle.value = v));
 
-// Save category title
+// Save title on blur
 function saveTitle() {
   const title = localTitle.value.trim();
-  if (title) emit('update-title', props.category.id, title);
+  if (title && title !== props.category.title) {
+    updateCategoryTitle(props.category.id, title);
+  }
 }
 
-// Todo event handlers
-function onCreateTodo(todo: TodoItemType) {
-  emit('add-todo', props.category.id, todo);
-}
-
-function onUpdateTodo(todo: TodoItemType) {
-  emit('update-todo', props.category.id, todo);
-}
-
-function onDeleteTodo(todoId: string) {
-  emit('delete-todo', props.category.id, todoId);
+// Delete category
+function deleteCategoryHandler() {
+  deleteCategory(props.category.id);
 }
 </script>
 
