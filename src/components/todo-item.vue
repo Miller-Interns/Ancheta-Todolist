@@ -118,12 +118,11 @@ export default defineComponent({
 
 .todo-item span,
 .edit-input {
-  cursor: pointer;
-  margin-bottom: 0.5rem;
-  word-break: break-word;
-  white-space: normal;
-  overflow-wrap: anywhere;
+  display: block;     /* forces full-width so wrapping is natural */
   width: 100%;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .todo-item span.completed {
@@ -132,7 +131,7 @@ export default defineComponent({
 
 .edit-input {
   padding: 0.25rem;
-  border: 1px solid #ccc;
+  border: 1px solid #050404;
   border-radius: 0.25rem;
 }
 

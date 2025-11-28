@@ -1,15 +1,13 @@
 <template>
   <div class="category-card">
-    <!-- Category Header -->
+
     <div class="card-header">
       <input v-model="localTitle" @blur="saveTitle" class="title-input" />
       <button @click="deleteCategoryHandler" class="delete-btn">Delete</button>
     </div>
 
-    <!-- Add Todo Form -->
     <add-todo-form :category-id="category.id" />
 
-    <!-- Todo Items -->
     <div class="todos">
       <todo-item
         v-for="t in category.todos"
@@ -54,6 +52,7 @@ function deleteCategoryHandler() {
   margin-bottom: 1rem;
   background: #d4d1c9;
   height:50vh;
+  width:25%
 }
 
 .card-header {

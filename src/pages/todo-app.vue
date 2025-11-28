@@ -1,5 +1,7 @@
 <template>
   <div class="app-root">
+    <button class="button" @click="go()">GO TO APP</button>
+
     <h2 class="todoHeader">To Do Categories </h2>
 
     <add-category-form class="addCategory" @create="onCreateCategory" />
@@ -27,6 +29,9 @@ import { useTodos } from '@/composables/use-todos';
 import AddCategoryForm from '@/components/add-category-form.vue';
 import CategoryCard from '@/components/category-card.vue';
 import type { TodoItem } from '@/types/TodoItem';
+import { useRouter } from 'vue-router'; 
+const router = useRouter();
+
 
 
 const {
@@ -72,6 +77,8 @@ function onDeleteTodo(categoryId: string, todoId: string) {
 function onReorder(categoryId: string, newTodos: TodoItem[]) {
   reorderTodos(categoryId, newTodos);
 }
+function go() { router.push('/'); }
+
 </script>
 
 <style scoped>
@@ -101,6 +108,6 @@ function onReorder(categoryId: string, newTodos: TodoItem[]) {
 
 .categoriesCard {
   width: 20%;
-  min-width: 200px; /* responsive */
+  min-width: 200px; 
 }
 </style>
