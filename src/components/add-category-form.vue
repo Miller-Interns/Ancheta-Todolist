@@ -14,14 +14,14 @@ import { ref } from 'vue';
 import { useTodos } from '@/composables/use-todos';
 
 const title = ref('');
-const { addCategory } = useTodos(); // use composable directly
+const { addCategory } = useTodos(); 
 
 function submit() {
   const trimmedTitle = title.value.trim();
   if (!trimmedTitle) return;
 
   addCategory({
-    id: String(Date.now()), // simple unique ID
+    id: String(Date.now()), 
     title: trimmedTitle,
     todos: []
   });

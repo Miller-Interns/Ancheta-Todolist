@@ -28,19 +28,12 @@ import AddTodoForm from './add-todo-form.vue';
 import TodoItem from './todo-item.vue';
 import { useTodos } from '../composables/use-todos.ts';
 
-// Props
 const props = defineProps<{ category: Category }>();
-
-// Composable
 const { updateCategoryTitle, deleteCategory } = useTodos();
-
-// Local title for editing
 const localTitle = ref(props.category.title);
 
-// Watch for external updates
 watch(() => props.category.title, (v) => (localTitle.value = v));
 
-// Save title on blur
 function saveTitle() {
   const title = localTitle.value.trim();
   if (title && title !== props.category.title) {
@@ -48,7 +41,6 @@ function saveTitle() {
   }
 }
 
-// Delete category
 function deleteCategoryHandler() {
   deleteCategory(props.category.id);
 }

@@ -4,7 +4,6 @@ import type { Category } from '../types/Category';
 
 const LS_KEY = 'TODO_LIST_DATA';
 
-// Make a single reactive instance
 const categories = ref<Category[]>(JSON.parse(localStorage.getItem(LS_KEY) || '[]'));
 
 const persist = () => {
@@ -12,17 +11,16 @@ const persist = () => {
 };
 
 export function useTodos() {
-  // Category actions
   const addCategory = (category: Category) => {
-  const exists = categories.value.some(
-    c => c.title.trim().toLowerCase() === category.title.trim().toLowerCase()
-  );
-  if (exists) {
-    throw new Error('Duplicate category not allowed');
-  }
-  categories.value.push(category);
-  persist();
-};
+    const exists = categories.value.some(
+      c => c.title.trim().toLowerCase() === category.title.trim().toLowerCase()
+    );
+    if (exists) {
+      throw new Error('Duplicate category not allowed');
+    }
+    categories.value.push(category);
+    persist();
+  };
 
 
   const updateCategoryTitle = (categoryId: string, title: string) => {
@@ -36,7 +34,6 @@ export function useTodos() {
     persist();
   };
 
-  // Todo actions
   const addTodo = (categoryId: string, todo: TodoItem) => {
     const category = categories.value.find(c => c.id === categoryId);
     if (category) {

@@ -51,13 +51,13 @@ export default defineComponent({
     todo: { type: Object as () => TodoItem, required: true }
   },
   setup(props) {
-    const { updateTodo, deleteTodo } = useTodos(); // composable
+    const { updateTodo, deleteTodo } = useTodos(); 
 
     const localTodo = ref<TodoItem>({ ...props.todo });
     const editing = ref(false);
     const tempText = ref(localTodo.value.text);
 
-    // Keep local copy in sync with prop
+
     watch(
       () => props.todo,
       (newVal) => {
@@ -67,20 +67,17 @@ export default defineComponent({
       { deep: true }
     );
 
-    // Toggle completed state
     const toggleCompleted = () => {
       updateTodo(props.categoryId, localTodo.value.id, {
         completed: !localTodo.value.completed
       });
     };
 
-    // Start editing
     const startEdit = () => {
       editing.value = true;
       tempText.value = localTodo.value.text;
     };
 
-    // Save edited text
     const saveEdit = () => {
       const text = tempText.value.trim();
       if (!text) {
@@ -91,7 +88,6 @@ export default defineComponent({
       editing.value = false;
     };
 
-    // Delete todo
     const deleteTodoHandler = () => {
       deleteTodo(props.categoryId, localTodo.value.id);
     };
@@ -113,11 +109,11 @@ export default defineComponent({
 }
 
 .todo-item.completedBg {
-  background-color: #d1fae5; /* light green */
+  background-color: #d1fae5; 
 }
 
 .todo-item.notCompletedBg {
-  background-color: #ffe4e9; /* pink */
+  background-color: #ffe4e9; 
 }
 
 .todo-item span,
@@ -147,11 +143,11 @@ export default defineComponent({
 }
 
 .done-btn.done {
-  background-color: #10b981; /* green */
+  background-color: #10b981; 
   color: white;
 }
 .done-btn.notdone {
-  background-color: #f86161; /* pink/red */
+  background-color: #f86161; 
   color: white;
 }
 
@@ -160,7 +156,7 @@ export default defineComponent({
   color: white;
 }
 .edit-btn.saving {
-  background-color: #10b981; /* green when editing */
+  background-color: #10b981; 
   color: white;
 }
 

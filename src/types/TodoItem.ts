@@ -1,5 +1,5 @@
 export interface TodoItem {
-id: string; // uuid or timestamp
+id: string; 
 text: string;
 completed: boolean;
 }

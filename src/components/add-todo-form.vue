@@ -26,7 +26,7 @@ export default defineComponent({
   },
   setup(props) {
     const todoText = ref('');
-    const { addTodo } = useTodos(); // Use singleton composable
+    const { addTodo } = useTodos(); 
 
     const submitTodo = () => {
       const text = todoText.value.trim();
@@ -38,10 +38,10 @@ export default defineComponent({
           text,
           completed: false
         };
-        addTodo(props.categoryId, newTodo); // reactive update
+        addTodo(props.categoryId, newTodo); 
         todoText.value = '';
       } catch (err: any) {
-        alert(err.message); // duplicate todo
+        alert(err.message); 
       }
     };
 

@@ -14,7 +14,7 @@ import { useRouter } from 'vue-router';
 
 
 const router = useRouter();
-const fullName = 'RAIN G. ANCHETA'; // replace with your name
+const fullName = 'RAIN G. ANCHETA'; 
 const startedOn = '11/21/2025';
 function go() { router.push('/app'); }
 </script>

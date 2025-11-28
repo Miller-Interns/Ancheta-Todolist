@@ -1,11 +1,9 @@
 <template>
   <div class="app-root">
-    <h2 class="todoHeader">TODO List Exercise</h2>
+    <h2 class="todoHeader">To Do Categories </h2>
 
-    <!-- Add Category Form -->
     <add-category-form class="addCategory" @create="onCreateCategory" />
 
-    <!-- Categories -->
     <div class="categories-wrapper">
       <div class="categories">
         <category-card
@@ -29,9 +27,8 @@ import { useTodos } from '@/composables/use-todos';
 import AddCategoryForm from '@/components/add-category-form.vue';
 import CategoryCard from '@/components/category-card.vue';
 import type { TodoItem } from '@/types/TodoItem';
-import type { Category } from '@/types/Category';
 
-// Use singleton composable to make state reactive across components
+
 const {
   categories,
   addCategory,
@@ -43,13 +40,10 @@ const {
   reorderTodos
 } = useTodos();
 
-// -------------------
-// Handlers
-// -------------------
 
 function onCreateCategory(title: string) {
   addCategory({
-    id: String(Date.now()), // simple unique id
+    id: String(Date.now()), 
     title,
     todos: []
   });
