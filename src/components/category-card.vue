@@ -10,7 +10,7 @@
     <add-todo-form :category-id="category.id" />
 
     <!-- Todo Items -->
-    <div>
+    <div class="todos">
       <todo-item
         v-for="t in category.todos"
         :key="t.id"
@@ -60,7 +60,8 @@ function deleteCategoryHandler() {
   border-radius: 0.5rem;
   padding: 1rem;
   margin-bottom: 1rem;
-  background: #f9f9f9;
+  background: #d4d1c9;
+  height:50vh;
 }
 
 .card-header {
@@ -90,5 +91,10 @@ function deleteCategoryHandler() {
 
 .delete-btn:hover {
   background: #be123c;
+}
+.todos{
+  margin-top:2%;
+  overflow-y: scroll;
+  height: 79%;
 }
 </style>
