@@ -1,62 +1,59 @@
 <template>
-  <div
-    class="todo-item"
-    :class="{ completedBg: localTodo.completed, notCompletedBg: !localTodo.completed }"
-  >
-    <!-- Todo text (editable) -->
+  <div class="todo-item" :class="{ completedBg: localTodo.completed, notCompletedBg: !localTodo.completed }">
     <span v-if="!editing" :class="{ completed: localTodo.completed }">
       {{ localTodo.text }}
     </span>
-    <input
-      v-else
-      v-model="tempText"
-      class="edit-input"
-    />
 
-    <!-- Buttons below the text -->
+    <input v-else v-model="tempText" class="edit-input" />
+
     <div class="button-row">
-      <button
-        class="done-btn"
-        :class="{ done: localTodo.completed, notdone: !localTodo.completed }"
-        @click="toggleCompleted"
-      >
-        {{ localTodo.completed ? 'Done' : 'Mark as Done' }}
+      <button class="done-btn" :class="{ done: localTodo.completed, notdone: !localTodo.completed }"
+        @click="toggleCompleted">
+        <CheckCircle class="icon" /> {{ completedLabel }}
       </button>
 
-      <!-- Edit / Save button -->
-      <button
-        class="edit-btn"
-        :class="{ saving: editing }"
-        @click="editing ? saveEdit() : startEdit()"
-      >
-        {{ editing ? '💾 Save' : '✏️ Edit' }}
+      <button class="edit-btn" :class="{ saving: editing }" @click="editing ? saveEdit() : startEdit()"
+        :disabled="editing && !tempText.trim()">
+        <template v-if="editing">
+          <Save class="icon" /> Save
+        </template>
+        <template v-else>
+          <Edit3 class="icon" /> Edit
+        </template>
       </button>
 
       <button class="delete-btn" @click="deleteTodo">
-        🗑 Delete
+        <Trash2 class="icon" /> Delete
       </button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
-import type { TodoItem } from '@/types/TodoItem';
-import { useTodos } from '@/composables/use-todos';
+import { defineComponent, ref, watch, computed } from "vue";
+import type { TodoItem } from "@/types/TodoItem";
+import { useTodos } from "@/composables/use-todos";
+
+
+import { CheckCircle, Edit3, Save, Trash2 } from "lucide-vue-next";
 
 export default defineComponent({
-  name: 'TodoItem',
+  name: "TodoItem",
+  components: { CheckCircle, Edit3, Save, Trash2 },
   props: {
     categoryId: { type: String, required: true },
-    todo: { type: Object as () => TodoItem, required: true }
+    todo: { type: Object as () => TodoItem, required: true },
   },
   setup(props) {
-    const { updateTodo, deleteTodo } = useTodos(); 
+    const { updateTodo, deleteTodo } = useTodos();
 
     const localTodo = ref<TodoItem>({ ...props.todo });
     const editing = ref(false);
     const tempText = ref(localTodo.value.text);
 
+    const completedLabel = computed(() =>
+      localTodo.value.completed ? "Done" : "Mark as Done"
+    );
 
     watch(
       () => props.todo,
@@ -68,9 +65,13 @@ export default defineComponent({
     );
 
     const toggleCompleted = () => {
-      updateTodo(props.categoryId, localTodo.value.id, {
-        completed: !localTodo.value.completed
-      });
+      try {
+        updateTodo(props.categoryId, localTodo.value.id, {
+          completed: !localTodo.value.completed,
+        });
+      } catch (err: any) {
+        alert(err.message);
+      }
     };
 
     const startEdit = () => {
@@ -84,16 +85,29 @@ export default defineComponent({
         deleteTodo(props.categoryId, localTodo.value.id);
         return;
       }
-      updateTodo(props.categoryId, localTodo.value.id, { text });
-      editing.value = false;
+      try {
+        updateTodo(props.categoryId, localTodo.value.id, { text });
+        editing.value = false;
+      } catch (err: any) {
+        alert(err.message);
+      }
     };
 
     const deleteTodoHandler = () => {
       deleteTodo(props.categoryId, localTodo.value.id);
     };
 
-    return { localTodo, editing, tempText, toggleCompleted, startEdit, saveEdit, deleteTodo: deleteTodoHandler };
-  }
+    return {
+      localTodo,
+      editing,
+      tempText,
+      completedLabel,
+      toggleCompleted,
+      startEdit,
+      saveEdit,
+      deleteTodo: deleteTodoHandler,
+    };
+  },
 });
 </script>
 
@@ -105,20 +119,20 @@ export default defineComponent({
   margin: 10px 0;
   border: 1px solid #ddd;
   border-radius: 0.5rem;
-  background: pink;
+  background: #fdf6f0;
 }
 
 .todo-item.completedBg {
-  background-color: #d1fae5; 
+  background-color: #d1fae5;
 }
 
 .todo-item.notCompletedBg {
-  background-color: #ffe4e9; 
+  background-color: #fff0f0;
 }
 
 .todo-item span,
 .edit-input {
-  display: block;     /* forces full-width so wrapping is natural */
+  display: block;
   width: 100%;
   white-space: normal;
   word-break: break-word;
@@ -131,7 +145,7 @@ export default defineComponent({
 
 .edit-input {
   padding: 0.25rem;
-  border: 1px solid #050404;
+  border: 1px solid #ccc;
   border-radius: 0.25rem;
 }
 
@@ -142,11 +156,12 @@ export default defineComponent({
 }
 
 .done-btn.done {
-  background-color: #10b981; 
+  background-color: #22c55e;
   color: white;
 }
+
 .done-btn.notdone {
-  background-color: #f86161; 
+  background-color: #ef4444;
   color: white;
 }
 
@@ -154,13 +169,20 @@ export default defineComponent({
   background-color: #f59e0b;
   color: white;
 }
+
 .edit-btn.saving {
-  background-color: #10b981; 
+  background-color: #3b82f6;
   color: white;
 }
 
+.edit-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  color: #f3f4f6;
+}
+
 .delete-btn {
-  background-color: #ef4444;
+  background-color: #dc2626;
   color: white;
 }
 
@@ -171,5 +193,18 @@ export default defineComponent({
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   cursor: pointer;
+}
+
+.done-btn:hover:not(:disabled),
+.edit-btn:hover:not(:disabled),
+.delete-btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.icon {
+  vertical-align: middle;
+  margin-right: 0.25rem;
+  width: 16px;
+  height: 16px;
 }
 </style>

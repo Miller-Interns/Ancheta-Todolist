@@ -8,17 +8,9 @@
 
     <div class="categories-wrapper">
       <div class="categories">
-        <category-card
-          v-for="cat in categories"
-          :key="cat.id"
-          :category="cat"
-          @delete="onDeleteCategory"
-          @update-title="onUpdateTitle"
-          @add-todo="onAddTodo"
-          @update-todo="onUpdateTodo"
-          @delete-todo="onDeleteTodo"
-          @reorder="onReorder"
-        />
+        <category-card v-for="cat in categories" :key="cat.id" :category="cat" @delete="onDeleteCategory"
+          @update-title="onUpdateTitle" @add-todo="onAddTodo" @update-todo="onUpdateTodo" @delete-todo="onDeleteTodo"
+          @reorder="onReorder" />
       </div>
     </div>
   </div>
@@ -29,10 +21,8 @@ import { useTodos } from '@/composables/use-todos';
 import AddCategoryForm from '@/components/add-category-form.vue';
 import CategoryCard from '@/components/category-card.vue';
 import type { TodoItem } from '@/types/TodoItem';
-import { useRouter } from 'vue-router'; 
+import { useRouter } from 'vue-router';
 const router = useRouter();
-
-
 
 const {
   categories,
@@ -45,10 +35,9 @@ const {
   reorderTodos
 } = useTodos();
 
-
 function onCreateCategory(title: string) {
   addCategory({
-    id: String(Date.now()), 
+    id: String(Date.now()),
     title,
     todos: []
   });
@@ -77,7 +66,7 @@ function onDeleteTodo(categoryId: string, todoId: string) {
 function onReorder(categoryId: string, newTodos: TodoItem[]) {
   reorderTodos(categoryId, newTodos);
 }
-function go() { router.push('/'); }
+function go() { router.push({ name: 'Home' }); }
 
 </script>
 
@@ -108,6 +97,6 @@ function go() { router.push('/'); }
 
 .categoriesCard {
   width: 20%;
-  min-width: 200px; 
+  min-width: 200px;
 }
 </style>
