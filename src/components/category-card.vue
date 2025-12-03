@@ -141,6 +141,7 @@ function deleteCategoryHandler() {
 .todos {
   margin-top: 2%;
   height: 79%;
+  overflow-y: auto;
 }
 
 .icon {
